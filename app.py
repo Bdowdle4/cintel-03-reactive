@@ -57,13 +57,13 @@ with ui.navset_pill(id="tab"):
 
         @render.data_frame
         def penguin_datatable():
-            return render.DataTable(penguins_df)
+            return render.DataTable(filtered_data())
 
     with ui.nav_panel("Data Grid"):
 
         @render.data_frame
         def penguin_datagrid():
-            return render.DataGrid(penguins_df)
+            return render.DataGrid(filtered_data())
 
 
 # This will organize the Plotly Histogram, Seaborn Histogram, and the Plotly scatterplot into a card to separate from the above "Data's" amd be easier to see
@@ -74,7 +74,7 @@ with ui.navset_card_pill(id="tab1"):
         @render_plotly
         def plotly_histogram():
             plotly_hist = px.histogram(
-                data_frame=penguins_df,
+                data_frame=filtered_data(),
                 x=input.selected_attribute(),
                 nbins=input.plotly_bin_count(),
                 color="species",
@@ -91,7 +91,7 @@ with ui.navset_card_pill(id="tab1"):
         @render.plot
         def seaborn_histogram():
             seaborn_hist = sns.histplot(
-                data=penguins_df,
+                data=filtered_data(),
                 x=input.selected_attribute(),
                 bins=input.seaborn_bin_count(),
             )
@@ -106,7 +106,7 @@ with ui.navset_card_pill(id="tab1"):
         @render_plotly
         def plotly_scatterplot():
             plotly_scatter = px.scatter(
-                penguins_df,
+                filtered_data(),
                 x="bill_depth_mm",
                 y="bill_length_mm",
                 color="species",
