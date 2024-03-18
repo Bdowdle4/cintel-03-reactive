@@ -127,11 +127,8 @@ with ui.navset_card_pill(id="tab1"):
 # The function will be called whenever an input functions used to generate that output changes.
 # Any output that depends on the reactive function (e.g., filtered_data()) will be updated when the data changes.
 
-# Reactive calculation to filter the data by selected species and islands
+
 @reactive.calc
 def filtered_data():
-    selected_species = input.selected_species_list()
-    selected_islands = input.selected_island_list()  # Get the list of selected islands
-    filtered_df = penguins_df[(penguins_df['species'].isin(selected_species)) & 
-                              (penguins_df['island'].isin(selected_islands))]  # Apply both filters
-    return filtered_df
+    return penguins_df
+
