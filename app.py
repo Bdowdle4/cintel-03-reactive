@@ -2,6 +2,7 @@
 import plotly.express as px
 from shiny.express import input, ui
 from shinywidgets import render_plotly
+from shinyswatch import theme
 
 # This package provides the Palmer Penguins dataset but you have to load it before you can use it
 from palmerpenguins import (
@@ -17,23 +18,13 @@ penguins_df = load_penguins()
 # This creates a title for your visual pane
 ui.page_opts(title="Brittany's Data About Spectacular Penguins", fillable=False)
 
+#This will change the look of your UI, there are so many to try!
+theme.yeti()
+
 # This adds a Shiny UI sidebar for user interaction. We will be adding a dropdown, numeric, and slider option
 with ui.sidebar(open="open"):
     # This will add a 2nd level header to the sidebar
     ui.h2("Sidebar")
-    ui.input_selectize(
-        "selected_attribute",
-        "Select Attribute",
-        ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"],
-    )
-    ui.input_numeric("plotly_bin_count", "Plotly Bin Count", 40)
-    ui.input_slider(
-        "seaborn_bin_count",
-        "Seaborn Bin Count",
-        1,
-        100,
-        40,
-    )
     ui.input_checkbox_group(
         "selected_species_list",
         "Select Species",
@@ -42,12 +33,33 @@ with ui.sidebar(open="open"):
         inline=True,
     )
 
+    ui.input_selectize(
+        "selected_attribute",
+        "Select Attribute",
+        ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"],
+    )
+    ui.input_slider(
+        "seaborn_bin_count",
+        "Seaborn Bin Count",
+        1,
+        100,
+        40,
+    )
+    ui.input_numeric("plotly_bin_count", "Plotly Bin Count", 40)
+    ui.input_checkbox_group(
+        "selected_island_list",
+        "Select Island",
+        penguins_df["island"].unique().tolist(),
+        selected=penguins_df["island"].unique().tolist(),
+        inline=True,
+    )
+
     # This will create a line to visually separate the widgets above and below it in the sidebar
     ui.hr()
     # This will add in a hyperlink to another website
     ui.a(
-        "Brittany's GitHub Link to P2",
-        href="https://github.com/Bdowdle4/cintel-02-data-",
+        "Brittany's GitHub Link to P3",
+        href="https://github.com/Bdowdle4/cintel-03-reactive",
         target="_blank",
     )
 
@@ -103,6 +115,7 @@ with ui.navset_card_pill(id="tab1"):
     with ui.nav_panel("Plotly Scatterplot"):
         ui.card_header("Plotly Scatterplot: Species")
 
+        # Add facet_col parameter to separate scatterplots by island
         @render_plotly
         def plotly_scatterplot():
             plotly_scatter = px.scatter(
@@ -110,6 +123,7 @@ with ui.navset_card_pill(id="tab1"):
                 x="bill_depth_mm",
                 y="bill_length_mm",
                 color="species",
+                facet_col="island",
                 size_max=8,
                 labels={
                     "bill_depth_mm": "Bill Depth (mm)",
@@ -118,9 +132,6 @@ with ui.navset_card_pill(id="tab1"):
             )
             return plotly_scatter
 
-# --------------------------------------------------------
-# Reactive calculations and effects
-# --------------------------------------------------------
 
 # Add a reactive calculation to filter the data
 # By decorating the function with @reactive, we can use the function to filter the data
@@ -130,4 +141,7 @@ with ui.navset_card_pill(id="tab1"):
 
 @reactive.calc
 def filtered_data():
-    return penguins_df[penguins_df["species"].isin(input.selected_species_list())]
+    return penguins_df[
+        (penguins_df["species"].isin(input.selected_species_list()))
+        & (penguins_df["island"].isin(input.selected_island_list()))
+    ]
